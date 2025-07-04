@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  ADMIN
+  SERVICE_PROVIDER
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String
+  name          String
+  role          Role
+  date_of_birth DateTime?
+  status        String    @default("active")
+  phone         String?
+  profile_color String?
+  profile_image String?
+
+  created_at       DateTime                  @default(now())
+  updated_at       DateTime                  @updatedAt
+  // Relations
+  service_provider ServiceProvider?
+  bookings         Booking[]
+  payments         Payment[]
+  favorites        FavoriteServiceProvider[]
+}
+
+model ServiceProvider {
+  id               Int                       @id @default(autoincrement())
+  user_id          Int                       @unique
+  user             User                      @relation(fields: [user_id], references: [id])
+  ethnicity        String?
+  hair_color       String?
+  experience_years Int?
+  certifications   String?
+  specialties      String?
+  address          String?
+  services         Service[]
+  bookings         Booking[]
+  payments         Payment[]
+  favorites        FavoriteServiceProvider[]
+  GalleryImage     GalleryImage[]
+}
+
+model Service {
+  id                  Int             @id @default(autoincrement())
+  name                String
+  description         String
+  price               Float
+  duration            Int             @default(60) // Duration in minutes
+  calendar_color      String? // Color for calendar display
+  status              String          @default("active")
+  service_provider_id Int
+  service_provider    ServiceProvider @relation(fields: [service_provider_id], references: [id])
+  bookings            Booking[]
+}
+
+model Booking {
+  id                  Int             @id @default(autoincrement())
+  user_id             Int
+  user                User            @relation(fields: [user_id], references: [id])
+  service_provider_id Int
+  service_provider    ServiceProvider @relation(fields: [service_provider_id], references: [id])
+  service_id          Int
+  service             Service         @relation(fields: [service_id], references: [id])
+  date                DateTime
+  status              String
+  payment             Payment?
+  created_at          DateTime        @default(now())
+}
+
+model Payment {
+  id                  Int             @id @default(autoincrement())
+  amount              Float
+  status              String
+  user_id             Int
+  user                User            @relation(fields: [user_id], references: [id])
+  service_provider_id Int
+  service_provider    ServiceProvider @relation(fields: [service_provider_id], references: [id])
+  booking_id          Int?            @unique
+  booking             Booking?        @relation(fields: [booking_id], references: [id])
+  created_at          DateTime        @default(now())
+}
+
+model FavoriteServiceProvider {
+  id                  Int             @id @default(autoincrement())
+  user_id             Int
+  user                User            @relation(fields: [user_id], references: [id])
+  service_provider_id Int
+  service_provider    ServiceProvider @relation(fields: [service_provider_id], references: [id])
+  created_at          DateTime        @default(now())
+
+  @@unique([user_id, service_provider_id])
+}
+
+model GalleryImage {
+  id                  Int             @id @default(autoincrement())
+  service_provider    ServiceProvider @relation(fields: [service_provider_id], references: [id])
+  service_provider_id Int
+  filename            String
+  created_at          DateTime        @default(now())
+}
