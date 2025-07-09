@@ -7,7 +7,7 @@ export async function POST(request) {
     try {
         const { email, password } = await request.json();
         if (!email || !password) {
-            return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
+            return NextResponse.json({ success: false, message: 'Email and password are required.' }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({
@@ -18,12 +18,12 @@ export async function POST(request) {
         });
 
         if (!user) {
-            return NextResponse.json({ error: 'Invalid credentials.' }, { status: 401 });
+            return NextResponse.json({ success: false, message: 'Invalid credentials.' }, { status: 401 });
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            return NextResponse.json({ error: 'Invalid credentials.' }, { status: 401 });
+            return NextResponse.json({ success: false, message: 'Invalid credentials.' }, { status: 401 });
         }
 
         // Create JWT payload
@@ -52,8 +52,9 @@ export async function POST(request) {
 
         // Create response
         const response = NextResponse.json({
-            user: userWithoutPassword,
-            message: 'Login successful'
+            success: true,
+            message: 'Login successful',
+            data: { user: userWithoutPassword }
         });
 
         // Set JWT token as HTTP-only cookie
@@ -67,6 +68,6 @@ export async function POST(request) {
         return response;
     } catch (error) {
         console.error('Login error:', error);
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        return NextResponse.json({ success: false, message: 'Internal server error.' }, { status: 500 });
     }
 } 

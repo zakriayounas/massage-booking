@@ -15,13 +15,13 @@ export async function POST(request) {
         const imageFile = formData.get('profile_image');
 
         if (!email || !password || !name) {
-            return NextResponse.json({ error: 'Email, password, and name are required.' }, { status: 400 });
+            return NextResponse.json({ success: false, message: 'Email, password, and name are required.' }, { status: 400 });
         }
 
         // Check if user already exists
         const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
-            return NextResponse.json({ error: 'User with this email already exists.' }, { status: 400 });
+            return NextResponse.json({ success: false, message: 'User with this email already exists.' }, { status: 400 });
         }
 
         // Hash password
@@ -36,7 +36,7 @@ export async function POST(request) {
             const filename = await saveImage(imageFile);
             if (filename) profile_image = filename;
         } catch (error) {
-            return NextResponse.json({ error: error.message }, { status: 400 });
+            return NextResponse.json({ success: false, message: error.message }, { status: 400 });
         }
 
         // Create user
@@ -73,9 +73,9 @@ export async function POST(request) {
             profile_image: getImageUrl(user.profile_image)
         };
 
-        return NextResponse.json({ user: userWithProfileUrl, message: 'Admin created successfully.' }, { status: 201 });
+        return NextResponse.json({ success: true, message: 'Admin created successfully.', data: { user: userWithProfileUrl } }, { status: 201 });
     } catch (error) {
         console.error('Signup admin error:', error);
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        return NextResponse.json({ success: false, message: 'Internal server error.' }, { status: 500 });
     }
 } 

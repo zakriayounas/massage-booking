@@ -58,7 +58,8 @@ export async function GET(request) {
 
         return NextResponse.json({ bookings });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 }
 
@@ -177,7 +178,7 @@ export async function POST(request) {
 
         return NextResponse.json({ booking, message: 'Booking created successfully.' }, { status: 201 });
     } catch (error) {
-        console.error('Booking error:', error);
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 } 

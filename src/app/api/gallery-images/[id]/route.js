@@ -34,6 +34,7 @@ export async function DELETE(request, { params }) {
         await prisma.galleryImage.delete({ where: { id: imageId } });
         return NextResponse.json({ message: 'Gallery image deleted successfully.' });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 } 

@@ -21,7 +21,7 @@ export async function POST(request) {
 
         // Validate required fields
         if (!email || !password || !name) {
-            return NextResponse.json({ error: 'Email, password, and name are required.' }, { status: 400 });
+            return NextResponse.json({ success: false, message: 'Email, password, and name are required.' }, { status: 400 });
         }
 
         // Check if user already exists
@@ -30,7 +30,7 @@ export async function POST(request) {
         });
 
         if (existingUser) {
-            return NextResponse.json({ error: 'User with this email already exists.' }, { status: 400 });
+            return NextResponse.json({ success: false, message: 'User with this email already exists.' }, { status: 400 });
         }
 
         // Hash password
@@ -45,7 +45,7 @@ export async function POST(request) {
             const filename = await saveImage(imageFile);
             if (filename) profile_image = filename;
         } catch (error) {
-            return NextResponse.json({ error: error.message }, { status: 400 });
+            return NextResponse.json({ success: false, message: error.message }, { status: 400 });
         }
 
         // Create user and service provider in a transaction
@@ -67,7 +67,6 @@ export async function POST(request) {
             const serviceProvider = await tx.serviceProvider.create({
                 data: {
                     user_id: user.id,
-                    phone,
                     ethnicity,
                     hair_color,
                     experience_years: experience_years ? parseInt(experience_years) : null,
@@ -89,13 +88,10 @@ export async function POST(request) {
             profile_image: getImageUrl(userWithoutPassword.profile_image)
         };
 
-        return NextResponse.json({
-            user: { ...userWithProfileUrl, ...result.serviceProvider },
-            message: 'Service provider created successfully.'
-        }, { status: 201 });
+        return NextResponse.json({ success: true, message: 'Service provider created successfully.', data: { user: { ...userWithProfileUrl, ...result.serviceProvider } } }, { status: 201 });
 
     } catch (error) {
         console.error('Signup error:', error);
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        return NextResponse.json({ success: false, message: 'Internal server error.' }, { status: 500 });
     }
 } 

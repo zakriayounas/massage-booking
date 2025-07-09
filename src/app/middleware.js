@@ -3,9 +3,7 @@ import { jwtVerify } from 'jose';
 
 const AUTH_PATHS = [
     '/api/bookings',
-    '/api/bookings/',
     '/api/services',
-    '/api/services/'
 ];
 
 export async function middleware(request) {

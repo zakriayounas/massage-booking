@@ -38,7 +38,8 @@ export async function GET(request, { params }) {
 
         return NextResponse.json({ client });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 }
 
@@ -97,9 +98,10 @@ export async function PUT(request, { params }) {
         return NextResponse.json({ client, message: 'Client updated successfully.' });
     } catch (error) {
         if (error.code === 'P2025') {
-            return NextResponse.json({ error: 'Client not found.' }, { status: 404 });
+            return NextResponse.json({ success: false, message: 'Client not found.' }, { status: 404 });
         }
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 }
 
@@ -123,8 +125,9 @@ export async function DELETE(request, { params }) {
         return NextResponse.json({ message: 'Client deleted successfully.' });
     } catch (error) {
         if (error.code === 'P2025') {
-            return NextResponse.json({ error: 'Client not found.' }, { status: 404 });
+            return NextResponse.json({ success: false, message: 'Client not found.' }, { status: 404 });
         }
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 } 

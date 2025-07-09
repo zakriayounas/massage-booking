@@ -34,7 +34,8 @@ export async function GET(request, { params }) {
 
         return NextResponse.json({ service });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 }
 
@@ -112,9 +113,10 @@ export async function PUT(request, { params }) {
         return NextResponse.json({ service, message: 'Service updated successfully.' });
     } catch (error) {
         if (error.code === 'P2025') {
-            return NextResponse.json({ error: 'Service not found.' }, { status: 404 });
+            return NextResponse.json({ success: false, message: 'Service not found.' }, { status: 404 });
         }
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 }
 
@@ -161,8 +163,9 @@ export async function DELETE(request, { params }) {
         return NextResponse.json({ message: 'Service deleted successfully.' });
     } catch (error) {
         if (error.code === 'P2025') {
-            return NextResponse.json({ error: 'Service not found.' }, { status: 404 });
+            return NextResponse.json({ success: false, message: 'Service not found.' }, { status: 404 });
         }
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 } 

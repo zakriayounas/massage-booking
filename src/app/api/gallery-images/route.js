@@ -22,7 +22,8 @@ export async function GET(request) {
             }))
         });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 }
 
@@ -42,7 +43,8 @@ export async function POST(request) {
         try {
             filename = await saveImage(imageFile);
         } catch (error) {
-            return NextResponse.json({ error: error.message }, { status: 400 });
+            const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+            return NextResponse.json({ success: false, message: errorMsg }, { status: 400 });
         }
         const galleryImage = await prisma.galleryImage.create({
             data: {
@@ -58,6 +60,7 @@ export async function POST(request) {
             message: 'Gallery image uploaded successfully.'
         }, { status: 201 });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 } 

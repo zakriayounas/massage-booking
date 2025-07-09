@@ -32,7 +32,8 @@ export async function GET() {
 
         return NextResponse.json({ serviceProviders });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 }
 
@@ -105,6 +106,7 @@ export async function POST(request) {
 
         return NextResponse.json({ serviceProvider, message: 'Service provider created successfully.' }, { status: 201 });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+        const errorMsg = error?.message || error?.toString() || JSON.stringify(error) || 'Internal server error.';
+        return NextResponse.json({ success: false, message: errorMsg }, { status: 500 });
     }
 } 
