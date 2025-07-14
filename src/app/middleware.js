@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
+import { withCORSHeaders } from '@/lib/cors';
 
 const AUTH_PATHS = [
     '/api/bookings',
     '/api/services',
 ];
+
 
 export async function middleware(request) {
     const { pathname } = request.nextUrl;
@@ -34,16 +36,20 @@ export async function middleware(request) {
             }
 
             // Return the request with updated headers
-            return NextResponse.next({
+            const response = NextResponse.next({
                 request: {
                     headers: requestHeaders,
                 },
             });
+            // --- CORS DEMO: Add CORS headers here ---
+            return withCORSHeaders(response);
         } catch (e) {
             return NextResponse.json({ error: 'Invalid or expired token.' }, { status: 401 });
         }
     }
-    return NextResponse.next();
+    // --- CORS DEMO: Add CORS headers here ---
+    const response = NextResponse.next();
+    return withCORSHeaders(response)
 }
 
 export const config = {
