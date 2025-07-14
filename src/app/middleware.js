@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
-import { withCORSHeaders } from '@/lib/cors';
+import { NextResponse } from 'next/server';
 
 const AUTH_PATHS = [
     '/api/bookings',
@@ -10,7 +9,16 @@ const AUTH_PATHS = [
 
 export async function middleware(request) {
     const { pathname } = request.nextUrl;
-
+    if (request.method === "OPTIONS") {
+        return new NextResponse(null, {
+            status: 204,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            },
+        });
+    }
     // Protect specified API endpoints
     if (AUTH_PATHS.some(path => pathname.startsWith(path))) {
         const token = request.cookies.get('token')?.value;
@@ -42,16 +50,16 @@ export async function middleware(request) {
                 },
             });
             // --- CORS DEMO: Add CORS headers here ---
-            return withCORSHeaders(response);
+            return response;
         } catch (e) {
             return NextResponse.json({ error: 'Invalid or expired token.' }, { status: 401 });
         }
     }
     // --- CORS DEMO: Add CORS headers here ---
     const response = NextResponse.next();
-    return withCORSHeaders(response)
+    return response
 }
 
 export const config = {
-    matcher: ['/api/bookings/:path*', '/api/services/:path*'],
+    matcher: ['/api/'],
 }; 
